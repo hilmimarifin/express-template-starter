@@ -7,11 +7,14 @@ import rateLimit from 'express-rate-limit';
 
 import { HttpCode, ONE_HUNDRED, ONE_THOUSAND, SIXTY, AppError } from './core';
 import { CustomMiddlewares, ErrorMiddleware } from './features/shared';
+import { type PrismaClient } from '@prisma/client';
+import { logger } from './core/utils/logger';
 
 interface ServerOptions {
 	port: number;
 	routes: Router;
 	apiPrefix: string;
+	db: PrismaClient;
 }
 
 export class Server {
@@ -20,12 +23,14 @@ export class Server {
 	private readonly port: number;
 	private readonly routes: Router;
 	private readonly apiPrefix: string;
+	private readonly db: PrismaClient;
 
 	constructor(options: ServerOptions) {
-		const { port, routes, apiPrefix } = options;
+		const { port, routes, apiPrefix, db } = options;
 		this.port = port;
 		this.routes = routes;
 		this.apiPrefix = apiPrefix;
+		this.db = db;
 	}
 
 	async start(): Promise<void> {
@@ -79,8 +84,16 @@ export class Server {
 		// Handle errors middleware
 		this.routes.use(ErrorMiddleware.handleError);
 
+		this.db
+			.$connect()
+			.then(() => {
+				logger.info('Successfully connected to database!');
+			})
+			.catch((error) => {
+				logger.error(error);
+			});
 		this.serverListener = this.app.listen(this.port, () => {
-			console.log(`Server running on port ${this.port}...`);
+			logger.info(`Server running on port ${this.port}...`);
 		});
 	}
 
