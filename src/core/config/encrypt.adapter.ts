@@ -16,6 +16,8 @@ export const basicEncript = {
 	 * @returns - The hashed password.
 	 */
 	hashPassword: (password: string): string => {
+		console.log('INPUTED PASSWORD >>>>>>>>>>>>', password);
+
 		// Create the hash using the salt and the password
 		const hash = createHash('sha256')
 			.update(salt + password)
@@ -31,10 +33,12 @@ export const basicEncript = {
 	 * @returns - True if the password matches, false otherwise.
 	 */
 	comparePassword: (password: string, hash: string): boolean => {
+		console.log('INPUTED PASSWORD >>>>>>>>>>>>', password);
 		// Create a new hash with the given salt and password
 		const newHash = createHash('sha256')
 			.update(salt + password)
 			.digest('hex');
+		console.log('newHash', newHash, 'hash', hash);
 
 		// Compare the new hash with the original hash
 		return newHash === hash;

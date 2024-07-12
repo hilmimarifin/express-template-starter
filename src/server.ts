@@ -6,7 +6,7 @@ import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 
 import { HttpCode, ONE_HUNDRED, ONE_THOUSAND, SIXTY, AppError } from './core';
-import { CustomMiddlewares, ErrorMiddleware } from './features/shared';
+import { CustomMiddlewares } from './features/shared';
 import { type PrismaClient } from '@prisma/client';
 import { logger } from './core/utils/logger';
 
@@ -82,7 +82,7 @@ export class Server {
 		});
 
 		// Handle errors middleware
-		this.routes.use(ErrorMiddleware.handleError);
+		// this.routes.use(ErrorMiddleware.handleError);
 
 		this.db
 			.$connect()
