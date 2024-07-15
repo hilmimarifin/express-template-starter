@@ -19,5 +19,77 @@ model User {
   name    String?
   password  String
   avatar  String
-  role    String @default("user")
+  role_id  Int
+
+  role Role @relation(fields: [role_id], references: [id])
+
+  @@index([role_id], name: "user_role_idx")
+}
+
+model Role {
+  id   Int      @id @default(autoincrement())
+  name String   @unique
+
+  users       User[]
+  permissions RolePermission[]
+}
+
+model Menu {
+  id   Int    @id @default(autoincrement())
+  name String
+  url  String
+
+  submenus    SubMenu[]
+  permissions MenuPermission[]
+}
+
+model SubMenu {
+  id      Int    @id @default(autoincrement())
+  name    String
+  url     String
+  menu_id Int
+
+  menu        Menu @relation(fields: [menu_id], references: [id])
+  permissions SubMenuPermission[]
+
+  @@index([menu_id], name: "submenu_menu_idx")
+}
+
+model Permission {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  rolePermissions RolePermission[]
+  menuPermissions MenuPermission[]
+  submenuPermissions SubMenuPermission[]
+}
+
+model RolePermission {
+  role_id      Int
+  permission_id Int
+
+  role       Role       @relation(fields: [role_id], references: [id])
+  permission Permission @relation(fields: [permission_id], references: [id])
+
+  @@id([role_id, permission_id])
+}
+
+model MenuPermission {
+  menu_id       Int
+  permission_id Int
+
+  menu        Menu        @relation(fields: [menu_id], references: [id])
+  permission  Permission  @relation(fields: [permission_id], references: [id])
+
+  @@id([menu_id, permission_id])
+}
+
+model SubMenuPermission {
+  submenu_id    Int
+  permission_id Int
+
+  submenu     SubMenu     @relation(fields: [submenu_id], references: [id])
+  permission  Permission  @relation(fields: [permission_id], references: [id])
+
+  @@id([submenu_id, permission_id])
 }
