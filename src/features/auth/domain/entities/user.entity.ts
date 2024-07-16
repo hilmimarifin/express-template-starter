@@ -36,7 +36,7 @@ export class UserEntity {
 				{ constraint: 'password is required', fields: ['password'] }
 			]);
 		}
-		if (!role || (role as string).length === ZERO) {
+		if (!role) {
 			throw AppError.badRequest('This entity requires a role', [{ constraint: 'role is required', fields: ['role'] }]);
 		}
 		return new UserEntity(

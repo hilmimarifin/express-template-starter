@@ -13,7 +13,7 @@ export class AuthDatasourceImpl implements AuthDatasource {
 		}
 		const createdUser = {
 			...dto,
-			role: 'USER_ROLE',
+			role_id: 1,
 			avatar: ''
 		};
 		// Hash the password

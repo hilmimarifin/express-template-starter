@@ -1,10 +1,10 @@
 import * as crypto from 'crypto';
 
-import { FOUR, ONE_THOUSAND, SIXTY, THREE } from '../constants';
+import { FOUR, THREE } from '../constants';
 import { envs } from './envs.adapter';
 
 const JWT_SEED = envs.JWT_SEED;
-
+const RANDOM_NUMBER = 5;
 /**
  * JWT adapter for basic authentication.
  */
@@ -15,10 +15,10 @@ export const basicJWT = {
 	 * @param {number} expiresIn - The token expiration time in seconds.
 	 * @returns {string} The generated JWT token.
 	 */
-	generateToken: (payload: Record<string, unknown>, expiresIn: number = SIXTY * SIXTY): string => {
+	generateToken: (payload: Record<string, unknown>, expiresIn: number = THREE * RANDOM_NUMBER): string => {
 		const header = { alg: 'HS256', typ: 'JWT' };
 
-		const exp = Math.floor(Date.now() / ONE_THOUSAND) + expiresIn;
+		const exp = expiresIn;
 		const payloadWithExp = { ...payload, exp };
 
 		const headerEncoded = base64UrlEncode(JSON.stringify(header));
