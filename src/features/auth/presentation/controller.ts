@@ -36,11 +36,26 @@ export class AuthController {
 		const dto = LoginUserDto.create({ email, password });
 		new LoginUser(this.repository)
 			.execute(dto)
-			.then((result) => res.json({ data: result }))
+			.then((result) => {
+				res.cookie('token', result.token, { httpOnly: true, secure: true }).json({ data: result });
+			})
 			.catch(next);
 	};
 
 	public register = (
+		req: Request<unknown, unknown, RequestBodyRegister>,
+		res: Response<SuccessResponse<AuthEntity>>,
+		next: NextFunction
+	): void => {
+		const { email, name, password } = req.body;
+		const dto = RegisterUserDto.create({ email, name, password });
+		new RegisterUser(this.repository)
+			.execute(dto)
+			.then((result) => res.status(HttpCode.CREATED).json({ data: result }))
+			.catch(next);
+	};
+
+	public getRefreshToken = (
 		req: Request<unknown, unknown, RequestBodyRegister>,
 		res: Response<SuccessResponse<AuthEntity>>,
 		next: NextFunction

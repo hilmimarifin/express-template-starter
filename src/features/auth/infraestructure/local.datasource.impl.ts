@@ -22,11 +22,12 @@ export class AuthDatasourceImpl implements AuthDatasource {
 		await this.prisma.user.create({ data: createdUser });
 		// Create the auth entity (omit the password)
 		const userData = await this.prisma.user.findFirst({ where: { email: dto.email } });
+
 		if (userData === null) {
 			throw new Error('User not found');
 		}
 
-		const { password, ...rest } = UserEntity.fromJson(userData);
+		const { password, ...rest } = UserEntity.fromJson({ ...userData, roleId: userData.role_id });
 		const token = basicJWT.generateToken({ id: userData.id });
 		// ? Here you can verify if the token is created correctly before to send it to the client
 		return new AuthEntity(rest, token);
@@ -37,7 +38,7 @@ export class AuthDatasourceImpl implements AuthDatasource {
 		if (!user) throw AppError.badRequest('User with this email not found');
 		const isPasswordMatch = basicEncript.comparePassword(dto.password, user.password);
 		if (!isPasswordMatch) throw AppError.badRequest('Invalid password');
-		const { password, ...rest } = UserEntity.fromJson({ ...user });
+		const { password, ...rest } = UserEntity.fromJson({ ...user, roleId: user.role_id });
 		const token = basicJWT.generateToken({ id: user.id });
 		// ? Here you can verify if the token is created correctly before to send it to the client
 		return new AuthEntity(rest, token);
@@ -46,6 +47,12 @@ export class AuthDatasourceImpl implements AuthDatasource {
 	public async getUserById(dto: string): Promise<UserEntity> {
 		const user = await this.prisma.user.findUnique({ where: { id: dto } });
 		if (!user) throw AppError.badRequest('User with this id not found');
-		return UserEntity.fromJson({ ...user });
+		return UserEntity.fromJson({ ...user, roleId: user.role_id });
+	}
+
+	public async getRefreshToken(): Promise<Omit<AuthEntity, 'user'>> {
+		const user = await this.prisma.user.findUnique({ where: { id: dto } });
+		if (!user) throw AppError.badRequest('User with this id not found');
+		return UserEntity.fromJson({ ...user, roleId: user.role_id });
 	}
 }

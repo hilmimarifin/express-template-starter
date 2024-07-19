@@ -1,5 +1,5 @@
 import { type Response, type NextFunction, type Request } from 'express';
-import { AppError, ONE, basicJWT } from '../../../../core';
+import { AppError, ONE, ONE_THOUSAND, basicJWT } from '../../../../core';
 
 import { type AuthRepository, GetUserById } from '../../../auth';
 import { logger } from '../../../../core/utils/logger';
@@ -22,13 +22,16 @@ export class AuthMiddleware {
 		}
 
 		const token = authorization.split(' ').at(ONE) ?? '';
-		const payload = basicJWT.validateToken<{ id: string }>(token);
+		const payload = basicJWT.validateToken<{ id: string; exp: number }>(token);
 
 		if (!payload) {
 			logger.error('Invalid token');
 			throw AppError.unauthorized('Invalid token');
 		}
-
+		if (payload.exp < Date.now() / ONE_THOUSAND) {
+			logger.error('Token expired');
+			throw AppError.unauthorized('Token expired');
+		}
 		new GetUserById(this.repository)
 			.execute(payload.id)
 			.then((result) => {

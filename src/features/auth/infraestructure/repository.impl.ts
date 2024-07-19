@@ -23,4 +23,8 @@ export class AuthRepositoryImpl implements AuthRepository {
 	public async getUserById(dto: string): Promise<UserEntity> {
 		return await this.datasource.getUserById(dto);
 	}
+
+	public async getRefreshToken(): Promise<Omit<AuthEntity, 'user'>> {
+		return await this.datasource.getRefreshToken();
+	}
 }

@@ -1,9 +1,7 @@
-import { createHash, randomBytes } from 'crypto';
-
-import { TEN } from '../constants';
+import { createHash } from 'crypto';
 
 // Generate a random salt
-const salt = randomBytes(TEN).toString('hex');
+const salt = 'djsklfjaklejfkjksdjafkljaseif';
 
 /**
  * Basic encryption adapter for password hashing and comparison.

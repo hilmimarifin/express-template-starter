@@ -8,7 +8,7 @@ export class UserEntity {
 		public name: string,
 		public email: string,
 		public password: string,
-		public role: string[],
+		public roleId: number,
 		public avatar?: string
 	) {}
 
@@ -19,7 +19,7 @@ export class UserEntity {
 	 * @returns UserEntity - A new UserEntity instance
 	 */
 	public static fromJson(obj: Record<string, unknown>): UserEntity {
-		const { id, name, email, password, role, avatar } = obj;
+		const { id, name, email, password, roleId, avatar } = obj;
 		if (!id) {
 			throw AppError.badRequest('This entity requires an id', [{ constraint: 'id is required', fields: ['id'] }]);
 		}
@@ -36,7 +36,7 @@ export class UserEntity {
 				{ constraint: 'password is required', fields: ['password'] }
 			]);
 		}
-		if (!role) {
+		if (!roleId) {
 			throw AppError.badRequest('This entity requires a role', [{ constraint: 'role is required', fields: ['role'] }]);
 		}
 		return new UserEntity(
@@ -45,7 +45,7 @@ export class UserEntity {
 			email as string,
 			// emailVerified as boolean,
 			password as string,
-			role as string[],
+			roleId as number,
 			avatar as string
 		);
 	}

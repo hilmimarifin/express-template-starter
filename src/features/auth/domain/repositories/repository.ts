@@ -8,4 +8,5 @@ export abstract class AuthRepository {
 	abstract login(dto: LoginUserDto): Promise<AuthEntity>;
 	// TODO: create a DTO for this method
 	abstract getUserById(dto: string): Promise<UserEntity>;
+	abstract getRefreshToken(): Promise<Omit<AuthEntity, 'user'>>;
 }

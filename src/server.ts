@@ -9,6 +9,7 @@ import { HttpCode, ONE_HUNDRED, ONE_THOUSAND, SIXTY, AppError } from './core';
 import { CustomMiddlewares } from './features/shared';
 import { type PrismaClient } from '@prisma/client';
 import { logger } from './core/utils/logger';
+import cookieParser from 'cookie-parser';
 
 interface ServerOptions {
 	port: number;
@@ -69,6 +70,7 @@ export class Server {
 		//* Routes
 		this.app.use(this.apiPrefix, this.routes);
 
+		this.app.use(cookieParser());
 		// Test rest api
 		this.app.get('/', (_req: Request, res: Response) => {
 			return res.status(HttpCode.OK).send({
