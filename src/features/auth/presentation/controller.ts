@@ -11,6 +11,7 @@ import {
 	RegisterUser,
 	LoginUserDto
 } from '../domain';
+import { GetRefreshToken } from '../domain/usecases/getRefreshToken.usecase';
 
 interface RequestBodyLogin {
 	email: string;
@@ -27,21 +28,6 @@ export class AuthController {
 	//* Dependency injection
 	constructor(private readonly repository: AuthRepository) {}
 
-	public login = (
-		req: Request<unknown, unknown, RequestBodyLogin>,
-		res: Response<SuccessResponse<AuthEntity>>,
-		next: NextFunction
-	): void => {
-		const { email, password } = req.body;
-		const dto = LoginUserDto.create({ email, password });
-		new LoginUser(this.repository)
-			.execute(dto)
-			.then((result) => {
-				res.cookie('token', result.token, { httpOnly: true, secure: true }).json({ data: result });
-			})
-			.catch(next);
-	};
-
 	public register = (
 		req: Request<unknown, unknown, RequestBodyRegister>,
 		res: Response<SuccessResponse<AuthEntity>>,
@@ -55,15 +41,32 @@ export class AuthController {
 			.catch(next);
 	};
 
-	public getRefreshToken = (
-		req: Request<unknown, unknown, RequestBodyRegister>,
+	public login = (
+		req: Request<unknown, unknown, RequestBodyLogin>,
 		res: Response<SuccessResponse<AuthEntity>>,
 		next: NextFunction
 	): void => {
-		const { email, name, password } = req.body;
-		const dto = RegisterUserDto.create({ email, name, password });
-		new RegisterUser(this.repository)
+		const { email, password } = req.body;
+		const dto = LoginUserDto.create({ email, password });
+		new LoginUser(this.repository)
 			.execute(dto)
+			.then((result) => {
+				res
+					.cookie('refreshToken', result.refreshToken, { httpOnly: true, secure: true, sameSite: 'strict' })
+					.json({ data: result });
+			})
+			.catch(next);
+	};
+
+	public getRefreshToken = (
+		req: Request<unknown, unknown, RequestBodyRegister>,
+		res: Response<SuccessResponse<Omit<AuthEntity, 'user'>>>,
+		next: NextFunction
+	): void => {
+		const { refreshToken } = req.cookies;
+
+		new GetRefreshToken(this.repository)
+			.execute(refreshToken)
 			.then((result) => res.status(HttpCode.CREATED).json({ data: result }))
 			.catch(next);
 	};

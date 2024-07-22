@@ -10,7 +10,7 @@ import { CustomMiddlewares } from './features/shared';
 import { type PrismaClient } from '@prisma/client';
 import { logger } from './core/utils/logger';
 import cookieParser from 'cookie-parser';
-
+import cors from 'cors';
 interface ServerOptions {
 	port: number;
 	routes: Router;
@@ -51,26 +51,32 @@ export class Server {
 		// Shared Middlewares
 		this.app.use(CustomMiddlewares.writeInConsole);
 
-		// CORS
-		this.app.use((req, res, next) => {
-			// Add your origins
-			const allowedOrigins = ['http://localhost:3000'];
-			const origin = req.headers.origin;
-			// TODO: Fix this
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			if (allowedOrigins.includes(origin!)) {
-				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-				res.setHeader('Access-Control-Allow-Origin', origin!);
-			}
-			res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-			res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-			next();
-		});
+		this.app.use(cookieParser());
 
+		// CORS
+		// this.app.use((req, res, next) => {
+		// 	// Add your origins
+		// 	const allowedOrigins = ['http://localhost:3000'];
+		// 	const origin = req.headers.origin;
+		// 	// TODO: Fix this
+		// 	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		// 	if (allowedOrigins.includes(origin!)) {
+		// 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		// 		res.setHeader('Access-Control-Allow-Origin', origin!);
+		// 	}
+		// 	res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+		// 	res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+		// 	next();
+		// });
+		this.app.use(
+			cors({
+				origin: '*',
+				credentials: true
+			})
+		);
 		//* Routes
 		this.app.use(this.apiPrefix, this.routes);
 
-		this.app.use(cookieParser());
 		// Test rest api
 		this.app.get('/', (_req: Request, res: Response) => {
 			return res.status(HttpCode.OK).send({

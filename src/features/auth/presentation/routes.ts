@@ -15,6 +15,7 @@ export class AuthRoutes {
 
 		router.post('/login', controller.login);
 		router.post('/register', controller.register);
+		router.get('/refresh-token', controller.getRefreshToken);
 
 		return router;
 	}
